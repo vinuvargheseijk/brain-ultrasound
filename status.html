@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Status | HIBITSU</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/frappe-gantt/0.6.1/frappe-gantt.css">
+    <style>
+        .status-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: var(--light-navy);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            overflow-x: auto;
+        }
+        /* Customizing the Gantt colors to match your theme */
+        .gantt .bar-progress { fill: var(--accent) !important; }
+        .gantt .bar { fill: #2d4e6d !important; }
+        .gantt .bar-label { fill: var(--white) !important; font-weight: bold; }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 16px;
+            cursor: pointer;
+            margin: 0 5px;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+        .btn:hover { background: var(--accent); color: var(--navy); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">About</a>
+        <a href="team.html">Team</a>
+        <a href="funding.html">Funding</a>
+        <a href="status.html" style="color: var(--white); border-bottom: 2px solid var(--accent);">Project Status</a>
+    </nav>
+
+    <header>
+        <h1>Project Timeline</h1>
+        <p>Interactive HIBITSU research milestones and progress tracking.</p>
+    </header>
+
+    <section>
+        <div class="controls">
+            <button class="btn" onclick="changeView('Day')">Day</button>
+            <button class="btn" onclick="changeView('Week')">Week</button>
+            <button class="btn" onclick="changeView('Month')">Month</button>
+        </div>
+
+        <div class="status-container">
+            <svg id="gantt"></svg>
+        </div>
+        
+        <p style="text-align: center; color: var(--accent); font-size: 0.8rem; margin-top: 20px;">
+            Note: Changes made by dragging are for visualization and will reset on refresh. Update the code to save permanently.
+        </p>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Ultrasound Brain Imaging Research</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/frappe-gantt/0.6.1/frappe-gantt.min.js"></script>
+    <script>
+        const tasks = [
+            {
+                id: 'Task 1',
+                name: 'System Design & Setup',
+                start: '2026-01-01',
+                end: '2026-02-15',
+                progress: 100,
+                dependencies: ''
+            },
+            {
+                id: 'Task 2',
+                name: 'Initial Imaging Trials',
+                start: '2026-02-16',
+                end: '2026-04-30',
+                progress: 65,
+                dependencies: 'Task 1'
+            },
+            {
+                id: 'Task 3',
+                name: 'Data Analysis Pipeline',
+                start: '2026-04-01',
+                end: '2026-07-15',
+                progress: 20,
+                dependencies: 'Task 2'
+            },
+            {
+                id: 'Task 4',
+                name: 'Manuscript Preparation',
+                start: '2026-08-01',
+                end: '2026-12-31',
+                progress: 0,
+                dependencies: 'Task 3'
+            }
+        ];
+
+        const gantt = new Gantt("#gantt", tasks, {
+            header_height: 50,
+            column_width: 30,
+            step: 24,
+            view_modes: ['Day', 'Week', 'Month'],
+            bar_height: 20,
+            bar_corner_radius: 3,
+            arrow_curve: 5,
+            padding: 18,
+            view_mode: 'Month',
+            date_format: 'YYYY-MM-DD',
+            on_date_change: (task, start, end) => {
+                console.log(task, start, end);
+            },
+            on_progress_change: (task, progress) => {
+                console.log(task, progress);
+            }
+        });
+
+        function changeView(mode) {
+            gantt.change_view_mode(mode);
+        }
+    </script>
+</body>
+</html>

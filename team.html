@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Team | HIBITSU Project</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .team-card {
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+            background: rgba(100, 255, 218, 0.05);
+        }
+
+        .profile-img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+        }
+
+        .name {
+            font-weight: bold;
+            color: var(--white);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .institution {
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html">About</a>
+    <a href="team.html" style="color: var(--white); border-bottom: 2px solid var(--accent);">Team</a>
+    <a href="funding.html">Funding</a>
+    <a href="status.html">Project Status</a>
+</nav>
+    <header>
+        <h1>The HIBITSU Team</h1>
+        <p>A multi-institutional collaboration advancing high-resolution ultrasound brain imaging.</p>
+    </header>
+
+    <section>
+        <div class="team-grid">
+            
+            <a href="https://www.ncbs.res.in/faculty/bhalla" target="_blank" class="team-card">
+                <img src="upi.jpg" alt="Dr. Upinder S. Bhalla" class="profile-img">
+                <div class="name">Dr. Upinder S. Bhalla</div>
+                <div class="institution">NCBS</div>
+            </a>
+
+            <a href="https://apm.iitm.ac.in/pages/profile-arunk.thittai" target="_blank" class="team-card">
+                <img src="arun_iitm.png" alt="Dr. Arun Thittai" class="profile-img">
+                <div class="name">Dr. Arun Thittai</div>
+                <div class="institution">IIT Madras</div>
+            </a>
+
+            <a href="https://cns.iisc.ac.in/people/sp-arun/" target="_blank" class="team-card">
+                <img src="sp-arun.jpg" alt="Dr. S. P. Arun" class="profile-img">
+                <div class="name">Dr. S. P. Arun</div>
+                <div class="institution">IISc</div>
+            </a>
+
+            <a href="https://www.ncbs.res.in/faculty/tapa" target="_blank" class="team-card">
+                <img src="tapa.jpeg" alt="Dr. Tapomoy Bhattacharjee" class="profile-img">
+                <div class="name">Dr. Tapomoy Bhattacharjee</div>
+                <div class="institution">NCBS</div>
+            </a>
+
+            <a href="https://pdmd.nimhans.ac.in/doctor/dr-dwarakanath-srinivas/" target="_blank" class="team-card">
+                <img src="ds.jpeg" alt="Dr. Dwarakanath Srinivas" class="profile-img">
+                <div class="name">Dr. Dwarakanath Srinivas</div>
+                <div class="institution">NIMHANS</div>
+            </a>
+
+        </div>
+    </section>
+
+    <footer>
+        <p>A multi-institutional Team Science project funded by the India Alliance.</p>
+        <p>&copy; 2026 Ultrasound Brain Imaging Research</p>
+    </footer>
+
+</body>
+</html>
