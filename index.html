@@ -3,16 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>High-Resolution Brain Imaging | Home</title>
+    <title>High-Resolution Brain Imaging | HIBITSU</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .intro-container {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .intro-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+    </style>
 </head>
 <body>
 
     <nav>
-        <a href="index.html">About</a>
-        <a href="team.html">Team</a> 
-        <a href="#funding">Funding</a>
-	<a href="status.html">Project Status</a>
+        <a href="index.html" style="color: var(--white); border-bottom: 2px solid var(--accent);">About</a>
+        <a href="team.html">Team</a>
+        <a href="funding.html">Funding</a>
+        <a href="status.html">Project Status</a>
     </nav>
 
     <header>
@@ -22,21 +35,20 @@
 
     <section id="about">
         <h2>Project Overview</h2>
-        <p>This research focuses on utilizing high-frequency ultrasound for non-invasive, high-resolution mapping of neural structures. By bridging the gap between computational models and physiological imaging, we aim to better understand hippocampal dynamics and synaptic signaling.</p>
-    </section>
-
-    <section id="imaging">
-        <h2>Research Gallery</h2>
-        <div class="gallery">
-            <div class="gallery-item"><img src="1.jpg" alt="Data 1"></div>
-            <div class="gallery-item"><img src="3.jpg" alt="Data 3"></div>
-            <div class="gallery-item"><img src="4.jpg" alt="Data 4"></div>
+        <p>
+            The <strong>HIBITSU</strong> (High-resolution Brain Imaging Through Skull using Ultrasound) project is a multi-institutional 
+            initiative. We focus on utilizing high-frequency ultrasound for non-invasive, high-resolution mapping of neural structures, 
+            bridging the gap between computational models and physiological imaging to better understand hippocampal dynamics.
+        </p>
+        
+        <div class="intro-container">
+            <img src="intro.png" alt="HIBITSU Project Introduction" class="intro-img">
         </div>
     </section>
 
     <footer id="funding">
-        <p>IndiaAlliance funded project 2023-2028</p>
-        <p>&copy; 2026 Ultrasound Brain Imaging Research</p>
+        <p>IndiaAlliance funded project 2023-2028 | Grant IA/TSG/22/1/600405</p>
+        <p>&copy; 2026 Ultrasound Brain Imaging Research | NCBS & IISc Ecosystem</p>
     </footer>
 
 </body>
