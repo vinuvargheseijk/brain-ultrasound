@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meetings | HIBITSU</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #lock-screen {
+            position: fixed; inset: 0;
+            background: var(--navy);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+
+        .lock-card {
+            background: var(--light-navy);
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            border-radius: 16px;
+            padding: 50px 44px 44px;
+            width: 100%; max-width: 420px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; align-items: center; gap: 28px;
+            animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(24px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .lock-icon {
+            width: 64px; height: 64px;
+            background: rgba(100, 255, 218, 0.08); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 1.5px solid rgba(100, 255, 218, 0.25);
+        }
+
+        .lock-icon svg { width: 28px; height: 28px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .lock-title { text-align: center; }
+        .lock-title h2 { color: var(--white); font-size: 1.4rem; font-weight: 700; border: none; padding: 0; margin-bottom: 6px; }
+        .lock-title p  { color: rgba(204, 214, 246, 0.55); font-size: 0.85rem; }
+
+        .input-wrap { position: relative; width: 100%; }
+
+        .input-wrap input {
+            width: 100%; padding: 14px 48px 14px 16px;
+            background: rgba(10, 25, 47, 0.8);
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            border-radius: 8px; color: var(--white); font-size: 1rem; outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(100,255,218,0.1); }
+
+        .input-wrap input.error {
+            border-color: #ff6b8a; box-shadow: 0 0 0 3px rgba(255,107,138,0.12);
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
+        }
+
+        .toggle-pw {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; padding: 0;
+            color: rgba(204,214,246,0.4); transition: color 0.2s; display: flex; align-items: center;
+        }
+        .toggle-pw:hover { color: var(--accent); }
+        .toggle-pw svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .error-msg { font-size: 0.8rem; color: #ff6b8a; text-align: center; min-height: 18px; }
+
+        .unlock-btn {
+            width: 100%; padding: 14px;
+            background: var(--accent); color: var(--navy);
+            border: none; border-radius: 8px;
+            font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+            cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(100,255,218,0.2);
+        }
+        .unlock-btn:hover { background: #7fffea; transform: translateY(-1px); box-shadow: 0 8px 28px rgba(100,255,218,0.3); }
+
+        .lock-screen-fade { animation: fadeOut 0.4s ease forwards; }
+        @keyframes fadeOut { to { opacity: 0; pointer-events: none; } }
+
+        /* Meetings content */
+        #meetings-content { display: none; }
+        #meetings-content.visible { display: block; }
+
+        .meetings-section {
+            max-width: 860px;
+            margin: 100px auto 60px;
+            padding: 20px;
+        }
+
+        .meetings-section > h2 {
+            color: var(--white);
+            border-left: 4px solid var(--accent);
+            padding-left: 15px;
+            margin-bottom: 36px;
+        }
+
+        .section-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(100, 255, 218, 0.08);
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            border-radius: 20px; padding: 4px 12px;
+            font-size: 0.75rem; color: var(--accent);
+            text-transform: uppercase; letter-spacing: 0.08em;
+            margin-bottom: 32px;
+        }
+
+        .group-label {
+            color: rgba(204, 214, 246, 0.35);
+            font-size: 0.72rem; text-transform: uppercase;
+            letter-spacing: 0.12em; margin: 28px 0 12px 4px;
+        }
+
+        .meetings-list { display: flex; flex-direction: column; gap: 14px; }
+
+        .meeting-card {
+            background: var(--light-navy);
+            border: 1px solid rgba(100, 255, 218, 0.12);
+            border-radius: 10px; padding: 20px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            text-decoration: none; gap: 20px;
+            transition: border-color 0.25s, transform 0.2s, box-shadow 0.2s;
+        }
+
+        .meeting-card:hover {
+            border-color: var(--accent);
+            transform: translateX(6px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        .meeting-info { display: flex; align-items: center; gap: 18px; }
+
+        .meeting-icon {
+            width: 44px; height: 44px; flex-shrink: 0;
+            background: rgba(100, 255, 218, 0.07); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid rgba(100, 255, 218, 0.15);
+        }
+
+        .meeting-icon svg { width: 20px; height: 20px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .meeting-meta { display: flex; flex-direction: column; gap: 4px; }
+        .meeting-date  { color: var(--white); font-size: 1rem; font-weight: 600; }
+        .meeting-label { color: rgba(204, 214, 246, 0.5); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+        .meeting-arrow { color: var(--accent); opacity: 0.5; transition: opacity 0.2s, transform 0.2s; flex-shrink: 0; }
+        .meeting-card:hover .meeting-arrow { opacity: 1; transform: translateX(4px); }
+        .meeting-arrow svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lock-screen">
+    <div class="lock-card">
+        <div class="lock-icon">
+            <svg viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+        </div>
+        <div class="lock-title">
+            <h2>Meetings Access</h2>
+            <p>Enter the password to view meeting minutes</p>
+        </div>
+        <div class="input-wrap">
+            <input type="password" id="pw-input" placeholder="Enter password" autocomplete="off" />
+            <button class="toggle-pw" onclick="toggleVisibility()" type="button">
+                <svg id="eye-icon" viewBox="0 0 24 24">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            </button>
+        </div>
+        <p class="error-msg" id="error-msg"></p>
+        <button class="unlock-btn" onclick="checkPassword()">Unlock</button>
+    </div>
+</div>
+
+<!-- MEETINGS CONTENT -->
+<div id="meetings-content">
+    <nav>
+        <a href="index.html">About</a>
+        <a href="team.html">Team</a>
+        <a href="funding.html">Funding</a>
+        <a href="status.html">Project Status</a>
+        <a href="private.html" style="color: var(--white); border-bottom: 2px solid var(--accent);">🔒 Meetings</a>
+    </nav>
+
+    <div class="meetings-section">
+        <h2>Meeting Minutes</h2>
+
+        <div class="section-badge">
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Restricted — Authorized Personnel Only
+        </div>
+
+        <p class="group-label">SAC Meeting</p>
+        <div class="meetings-list">
+            <a class="meeting-card" href="SAC_meeting_minutes.pdf" target="_blank">
+                <div class="meeting-info">
+                    <div class="meeting-icon">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <div class="meeting-meta">
+                        <span class="meeting-date">25 March 2026</span>
+                        <span class="meeting-label">SAC Meeting Minutes · PDF</span>
+                    </div>
+                </div>
+                <div class="meeting-arrow">
+                    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </a>
+        </div>
+
+        <p class="group-label">Team Meetings</p>
+        <div class="meetings-list">
+            <a class="meeting-card" href="Minutes_12_Dec_2025.pdf" target="_blank">
+                <div class="meeting-info">
+                    <div class="meeting-icon">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <div class="meeting-meta">
+                        <span class="meeting-date">12 December 2025</span>
+                        <span class="meeting-label">Meeting Minutes · PDF</span>
+                    </div>
+                </div>
+                <div class="meeting-arrow">
+                    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </a>
+
+            <a class="meeting-card" href="Minutes_19_06_2025.pdf" target="_blank">
+                <div class="meeting-info">
+                    <div class="meeting-icon">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <div class="meeting-meta">
+                        <span class="meeting-date">19 June 2025</span>
+                        <span class="meeting-label">Meeting Minutes · PDF</span>
+                    </div>
+                </div>
+                <div class="meeting-arrow">
+                    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <p>IndiaAlliance funded project 2023-2028 | Grant IA/TSG/22/1/600405</p>
+        <p>&copy; 2026 Ultrasound Brain Imaging Research | NCBS & IISc Ecosystem</p>
+    </footer>
+</div>
+
+<script>
+    const CORRECT = "inhibited_by_skull@2026";
+
+    function checkPassword() {
+        const input = document.getElementById('pw-input');
+        const errorMsg = document.getElementById('error-msg');
+        const lockScreen = document.getElementById('lock-screen');
+        const content = document.getElementById('meetings-content');
+
+        if (input.value === CORRECT) {
+            errorMsg.textContent = '';
+            lockScreen.classList.add('lock-screen-fade');
+            setTimeout(() => {
+                lockScreen.style.display = 'none';
+                content.classList.add('visible');
+            }, 400);
+        } else {
+            input.classList.remove('error');
+            void input.offsetWidth;
+            input.classList.add('error');
+            errorMsg.textContent = 'Incorrect password. Please try again.';
+            input.value = '';
+            setTimeout(() => input.classList.remove('error'), 500);
+        }
+    }
+
+    function toggleVisibility() {
+        const input = document.getElementById('pw-input');
+        const icon = document.getElementById('eye-icon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        } else {
+            input.type = 'password';
+            icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+        }
+    }
+
+    document.getElementById('pw-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') checkPassword();
+    });
+</script>
+</body>
+</html>

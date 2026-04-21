@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Status | HIBITSU</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/frappe-gantt/0.6.1/frappe-gantt.css">
     <style>
         .status-header-img {
             display: block;
@@ -21,34 +20,38 @@
             max-width: 1100px;
             margin: 0 auto;
             background: var(--light-navy);
-            padding: 20px;
+            padding: 28px 24px;
             border-radius: 12px;
             border: 1px solid rgba(100, 255, 218, 0.2);
             overflow-x: auto;
+
+            /* Map the gantt chart's CSS variables to the site theme */
+            --color-text-primary: #e6f1ff;
+            --color-text-secondary: #8892b0;
+            --color-background-secondary: rgba(255,255,255,0.04);
+            --color-border-tertiary: rgba(100, 255, 218, 0.12);
         }
 
-        /* Gantt chart theme overrides */
-        .gantt .bar-progress { fill: var(--accent) !important; }
-        .gantt .bar { fill: #2d4e6d !important; }
-        .gantt .bar-label { fill: var(--white) !important; font-weight: bold; }
-
-        .controls {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .btn {
-            background: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 8px 16px;
-            cursor: pointer;
-            margin: 0 5px;
-            border-radius: 4px;
-            transition: 0.3s;
-        }
-
-        .btn:hover { background: var(--accent); color: var(--navy); }
+        /* ── Gantt chart styles (from gantt_chart_ultrasound_project.html) ── */
+        .gantt-wrap { padding: 1.5rem 0; font-size: 13px; }
+        .gantt-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 1.5rem; }
+        .gantt-table { width: 100%; border-collapse: collapse; }
+        .gantt-table th { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-align: center; padding: 6px 4px; border-bottom: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); }
+        .gantt-table th.left-header { text-align: left; padding-left: 10px; }
+        .gantt-table td { padding: 10px 4px; vertical-align: middle; border-bottom: 0.5px solid var(--color-border-tertiary); }
+        .gantt-table td.task-name { font-size: 12px; color: var(--color-text-primary); padding-left: 10px; padding-right: 12px; width: 170px; line-height: 1.4; }
+        .gantt-table td.task-location { font-size: 11px; color: var(--color-text-secondary); padding-right: 12px; width: 170px; line-height: 1.4; }
+        .gantt-table td.year-cell { width: 72px; text-align: center; position: relative; }
+        .year-block { position: relative; height: 22px; border-radius: 4px; overflow: hidden; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); }
+        .year-block.allocated { background: rgba(100,255,218,0.06); border-color: rgba(100,255,218,0.2); }
+        .year-fill { height: 100%; border-radius: 3px; }
+        .fill-complete { background: #1D9E75; }
+        .fill-partial  { background: #378ADD; }
+        .fill-none     { background: transparent; }
+        .fill-amber    { background: #BA7517; }
+        .pct-label { font-size: 10px; font-weight: 500; color: var(--color-text-secondary); margin-top: 4px; display: block; text-align: center; }
+        .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 1.25rem; font-size: 11px; color: var(--color-text-secondary); }
+        .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 5px; vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -58,6 +61,7 @@
         <a href="team.html">Team</a>
         <a href="funding.html">Funding</a>
         <a href="status.html" style="color: var(--white); border-bottom: 2px solid var(--accent);">Project Status</a>
+        <a href="private.html">🔒 Meetings</a>
     </nav>
 
     <header>
@@ -68,78 +72,116 @@
     <section>
         <img src="4.jpg" alt="HIBITSU Research Progress" class="status-header-img">
 
-        <div class="controls">
-            <button class="btn" onclick="changeView('Day')">Day</button>
-            <button class="btn" onclick="changeView('Week')">Week</button>
-            <button class="btn" onclick="changeView('Month')">Month</button>
-        </div>
-
         <div class="status-container">
-            <svg id="gantt"></svg>
+          <div class="gantt-wrap">
+            <h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Gantt chart showing progress of ultrasound research project across 5 years</h2>
+
+            <table class="gantt-table">
+              <thead>
+                <tr>
+                  <th class="left-header" style="width:170px;">Work element</th>
+                  <th class="left-header" style="width:170px;">Location</th>
+                  <th>Year 1</th>
+                  <th>Year 2</th>
+                  <th>Year 3</th>
+                  <th>Year 4</th>
+                  <th>Year 5</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <!-- Row 1: Theory/models — 100% complete across Y1–Y3 -->
+                <tr>
+                  <td class="task-name">Theory/models of ultrasound configurations</td>
+                  <td class="task-location">NCRA (primary) + IITM + NCBS</td>
+                  <td class="year-cell">
+                    <div class="year-block allocated"><div class="year-fill fill-complete" style="width:100%;"></div></div>
+                  </td>
+                  <td class="year-cell">
+                    <div class="year-block allocated"><div class="year-fill fill-complete" style="width:100%;"></div></div>
+                  </td>
+                  <td class="year-cell">
+                    <div class="year-block allocated"><div class="year-fill fill-complete" style="width:100%;"></div></div>
+                  </td>
+                  <td class="year-cell"><div class="year-block"></div></td>
+                  <td class="year-cell"><div class="year-block"></div></td>
+                </tr>
+
+                <!-- Row 2: Prototype 3D biomimetics — 80% complete across Y2–Y4 -->
+                <tr>
+                  <td class="task-name">Prototype US imaging in 3-D biomimetics</td>
+                  <td class="task-location">IITM (Primary) + NCBS (mimetic samples)</td>
+                  <td class="year-cell"><div class="year-block"></div></td>
+                  <td class="year-cell">
+                    <div class="year-block allocated"><div class="year-fill fill-partial" style="width:100%;"></div></div>
+                  </td>
+                  <td class="year-cell">
+                    <div class="year-block allocated"><div class="year-fill fill-partial" style="width:100%;"></div></div>
+                  </td>
+                  <td class="year-cell">
+                    <div class="year-block allocated"><div class="year-fill fill-partial" style="width:40%;"></div></div>
+                  </td>
+                  <td class="year-cell"><div class="year-block"></div></td>
+                </tr>
+
+                <!-- Row 3: Animals & cadavers — 0% started across Y3–Y5 -->
+                <tr>
+                  <td class="task-name">Prototype US imaging in animals and cadavers</td>
+                  <td class="task-location">NCBS (rodent), IISc (primate), NIMHANS (cadavers)</td>
+                  <td class="year-cell"><div class="year-block"></div></td>
+                  <td class="year-cell"><div class="year-block"></div></td>
+                  <td class="year-cell">
+                    <div class="year-block allocated"><div class="year-fill fill-none" style="width:0%;"></div></div>
+                  </td>
+                  <td class="year-cell">
+                    <div class="year-block allocated"><div class="year-fill fill-none" style="width:0%;"></div></div>
+                  </td>
+                  <td class="year-cell">
+                    <div class="year-block allocated"><div class="year-fill fill-none" style="width:0%;"></div></div>
+                  </td>
+                </tr>
+
+                <!-- Row 4: Helmet US arrays — 30% complete across Y4–Y5 -->
+                <tr>
+                  <td class="task-name">Helmet US arrays</td>
+                  <td class="task-location">NIMHANS (Cadaver tests) + IITM (engg)</td>
+                  <td class="year-cell"><div class="year-block"></div></td>
+                  <td class="year-cell"><div class="year-block"></div></td>
+                  <td class="year-cell"><div class="year-block"></div></td>
+                  <td class="year-cell">
+                    <div class="year-block allocated"><div class="year-fill fill-amber" style="width:60%;"></div></div>
+                  </td>
+                  <td class="year-cell">
+                    <div class="year-block allocated"><div class="year-fill fill-none" style="width:0%;"></div></div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+
+            <div style="margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+              <div style="display:flex; gap: 8px; align-items:center; font-size: 11px; color: #8892b0;">
+                <span style="background:rgba(29,158,117,0.15); color:#64ffda; border-radius:3px; padding:2px 8px; font-weight:500;">Theory/models: 100%</span>
+                <span style="background:rgba(55,138,221,0.15); color:#7ec8ff; border-radius:3px; padding:2px 8px; font-weight:500;">3-D biomimetics: 80%</span>
+                <span style="background:rgba(255,255,255,0.05); color:#8892b0; border-radius:3px; padding:2px 8px; font-weight:500;">Animals & cadavers: 0%</span>
+                <span style="background:rgba(186,117,23,0.15); color:#ffc56e; border-radius:3px; padding:2px 8px; font-weight:500;">Helmet arrays: 30%</span>
+              </div>
+            </div>
+
+            <div class="legend">
+              <span><span class="legend-dot" style="background:#1D9E75;"></span>Completed</span>
+              <span><span class="legend-dot" style="background:#378ADD;"></span>In progress</span>
+              <span><span class="legend-dot" style="background:#BA7517;"></span>Partially started</span>
+              <span><span class="legend-dot" style="background:rgba(100,255,218,0.06); border: 0.5px solid rgba(100,255,218,0.2);"></span>Allocated, not started</span>
+              <span><span class="legend-dot" style="background:rgba(255,255,255,0.04); border: 0.5px solid rgba(100,255,218,0.12);"></span>Not in scope</span>
+            </div>
+          </div>
         </div>
-        
-        <p style="text-align: center; color: var(--accent); font-size: 0.8rem; margin-top: 20px;">
-            Visualization only. Update the JavaScript array in status.html to save changes permanently.
-        </p>
     </section>
 
     <footer>
-        <p>&copy; 2026 Ultrasound Brain Imaging Research</p>
+        <p>IndiaAlliance funded project 2023-2028 | Grant IA/TSG/22/1/600405</p>
+        <p>&copy; 2026 Ultrasound Brain Imaging Research | NCBS & IISc Ecosystem</p>
     </footer>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/frappe-gantt/0.6.1/frappe-gantt.min.js"></script>
-    <script>
-        const tasks = [
-            {
-                id: 'Task 1',
-                name: 'System Design & Setup',
-                start: '2026-01-01',
-                end: '2026-02-15',
-                progress: 100,
-                dependencies: ''
-            },
-            {
-                id: 'Task 2',
-                name: 'Initial Imaging Trials',
-                start: '2026-02-16',
-                end: '2026-04-30',
-                progress: 65,
-                dependencies: 'Task 1'
-            },
-            {
-                id: 'Task 3',
-                name: 'Data Analysis Pipeline',
-                start: '2026-04-01',
-                end: '2026-07-15',
-                progress: 20,
-                dependencies: 'Task 2'
-            },
-            {
-                id: 'Task 4',
-                name: 'Manuscript Preparation',
-                start: '2026-08-01',
-                end: '2026-12-31',
-                progress: 0,
-                dependencies: 'Task 3'
-            }
-        ];
-
-        const gantt = new Gantt("#gantt", tasks, {
-            header_height: 50,
-            column_width: 30,
-            step: 24,
-            view_modes: ['Day', 'Week', 'Month'],
-            bar_height: 20,
-            bar_corner_radius: 3,
-            arrow_curve: 5,
-            padding: 18,
-            view_mode: 'Month',
-            date_format: 'YYYY-MM-DD'
-        });
-
-        function changeView(mode) {
-            gantt.change_view_mode(mode);
-        }
-    </script>
 </body>
 </html>
