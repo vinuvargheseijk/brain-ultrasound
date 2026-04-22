@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Positions | HIBITSU Project</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ── Page-specific styles ── */
+        .positions-section {
+            max-width: 900px;
+            margin: 80px auto 60px;
+            padding: 20px;
+        }
+
+        .section-intro {
+            margin-bottom: 40px;
+            color: var(--text);
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        /* Position cards */
+        .positions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .position-card {
+            background: var(--light-navy);
+            border: 1px solid rgba(100,255,218,0.15);
+            border-radius: 12px;
+            padding: 28px 32px;
+            transition: border-color 0.3s, transform 0.3s;
+            position: relative;
+        }
+
+        .position-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .position-card .badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+
+        .badge-phd    { background: rgba(100,255,218,0.15); color: var(--accent); }
+        .badge-postdoc{ background: rgba(100,180,255,0.15); color: #64b8ff; }
+        .badge-ra     { background: rgba(255,200,100,0.15); color: #ffc864; }
+        .badge-intern { background: rgba(220,130,255,0.15); color: #dc82ff; }
+
+        .position-card h3 {
+            color: var(--white);
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+        }
+
+        .position-card .meta {
+            font-size: 0.82rem;
+            color: var(--accent);
+            opacity: 0.8;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .position-card p {
+            color: var(--text);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .apply-link {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 8px 18px;
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .apply-link:hover {
+            background: rgba(100,255,218,0.1);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text);
+            opacity: 0.5;
+        }
+
+        .empty-state svg { margin-bottom: 16px; opacity: 0.4; }
+
+        /* ── Admin toolbar ── */
+        .admin-bar {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 900;
+        }
+
+        .admin-bar button {
+            background: var(--accent);
+            color: var(--navy);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 22px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(100,255,218,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .admin-bar button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(100,255,218,0.45);
+        }
+
+        /* ── Overlay / Modal ── */
+        .overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .overlay.active { display: flex; }
+
+        .modal {
+            background: var(--light-navy);
+            border: 1px solid rgba(100,255,218,0.25);
+            border-radius: 16px;
+            width: 96%;
+            max-width: 560px;
+            padding: 36px 36px 28px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal h2 {
+            color: var(--white);
+            border-left: 4px solid var(--accent);
+            padding-left: 14px;
+            margin-bottom: 24px;
+            font-size: 1.2rem;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px; right: 20px;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.4rem;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .modal-close:hover { opacity: 1; }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            margin-bottom: 7px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            background: rgba(10,25,47,0.8);
+            border: 1px solid rgba(100,255,218,0.2);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--white);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .form-group select option {
+            background: var(--navy);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: var(--accent);
+            color: var(--navy);
+            border: none;
+            border-radius: 8px;
+            padding: 11px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary:hover { opacity: 0.85; }
+
+        .btn-secondary {
+            flex: 1;
+            background: transparent;
+            color: var(--text);
+            border: 1px solid rgba(100,255,218,0.25);
+            border-radius: 8px;
+            padding: 11px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* Error / success messages */
+        .msg-error   { color: #ff6b6b; font-size: 0.85rem; margin-top: 8px; }
+        .msg-success { color: var(--accent); font-size: 0.85rem; margin-top: 8px; }
+
+        /* Edit / delete buttons on cards (admin mode) */
+        .card-actions {
+            position: absolute;
+            top: 16px; right: 16px;
+            display: none;
+            gap: 8px;
+        }
+
+        body.admin-mode .card-actions { display: flex; }
+
+        .card-actions button {
+            background: rgba(10,25,47,0.9);
+            border: 1px solid rgba(100,255,218,0.25);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .btn-edit   { color: var(--accent); }
+        .btn-delete { color: #ff6b6b; }
+
+        .btn-edit:hover   { border-color: var(--accent); }
+        .btn-delete:hover { border-color: #ff6b6b; }
+
+        /* Admin mode indicator */
+        .admin-indicator {
+            display: none;
+            position: fixed;
+            top: 72px; right: 16px;
+            background: rgba(100,255,218,0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            z-index: 800;
+        }
+
+        body.admin-mode .admin-indicator { display: block; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html">About</a>
+    <a href="team.html">Team</a>
+    <a href="funding.html">Funding</a>
+    <a href="status.html">Project Status</a>
+    <a href="positions.html" style="color: var(--white); border-bottom: 2px solid var(--accent);">Positions Open</a>
+    <a href="private.html">🔒 Meetings</a>
+</nav>
+
+<header>
+    <h1>Open Positions</h1>
+    <p>Join the HIBITSU team — PhD, Postdoc, RA & Internship opportunities.</p>
+</header>
+
+<div class="admin-indicator">✎ Admin Mode</div>
+
+<section class="positions-section">
+    <h2>Current Openings</h2>
+    <p class="section-intro">
+        We welcome motivated researchers passionate about ultrasound neuroimaging,
+        computational modelling, and translational neuroscience. Positions span
+        multiple institutions (NCBS, IIT Madras, IISc, NIMHANS). To apply, click
+        the link on any listing or reach out directly to the relevant PI.
+    </p>
+
+    <div class="positions-list" id="positionsList">
+        <!-- positions rendered here by JS -->
+    </div>
+</section>
+
+<footer>
+    <p>A multi-institutional Team Science project funded by the India Alliance.</p>
+    <p>&copy; 2026 Ultrasound Brain Imaging Research | NCBS &amp; IISc Ecosystem</p>
+</footer>
+
+<!-- Admin FAB -->
+<div class="admin-bar">
+    <button id="adminBtn" onclick="openAuth()">✎ Edit Positions</button>
+</div>
+
+<!-- ── Password Modal ── -->
+<div class="overlay" id="authOverlay">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal('authOverlay')">×</button>
+        <h2>Admin Access</h2>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="pwInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')checkPassword()">
+        </div>
+        <div id="pwError" class="msg-error" style="display:none">Incorrect password. Try again.</div>
+        <div class="form-actions">
+            <button class="btn-primary" onclick="checkPassword()">Unlock</button>
+            <button class="btn-secondary" onclick="closeModal('authOverlay')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Add / Edit Position Modal ── -->
+<div class="overlay" id="editOverlay">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal('editOverlay')">×</button>
+        <h2 id="editModalTitle">Add Position</h2>
+
+        <div class="form-group">
+            <label>Position Title *</label>
+            <input type="text" id="fTitle" placeholder="e.g. PhD Student – Computational Neuroscience">
+        </div>
+        <div class="form-group">
+            <label>Type *</label>
+            <select id="fType">
+                <option value="phd">PhD Student</option>
+                <option value="postdoc">Postdoc</option>
+                <option value="ra">Research Associate</option>
+                <option value="intern">Intern / Project Student</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Institution / Location</label>
+            <input type="text" id="fMeta" placeholder="e.g. NCBS, Bangalore | 5 Years">
+        </div>
+        <div class="form-group">
+            <label>Description *</label>
+            <textarea id="fDesc" placeholder="Describe the role, responsibilities, and required background…"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Apply / Contact Link</label>
+            <input type="text" id="fLink" placeholder="mailto:pi@institution.in  or  https://…">
+        </div>
+        <div class="form-group">
+            <label>Apply Button Label</label>
+            <input type="text" id="fLinkLabel" placeholder="Apply Now">
+        </div>
+
+        <div id="editError" class="msg-error" style="display:none">Please fill in all required fields.</div>
+        <div class="form-actions">
+            <button class="btn-primary" onclick="savePosition()">Save Position</button>
+            <button class="btn-secondary" onclick="closeModal('editOverlay')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Confirm Delete Modal ── -->
+<div class="overlay" id="deleteOverlay">
+    <div class="modal" style="max-width:400px; text-align:center">
+        <button class="modal-close" onclick="closeModal('deleteOverlay')">×</button>
+        <h2 style="border:none; padding:0; margin-bottom:12px; justify-content:center; display:flex;">Delete Position?</h2>
+        <p style="margin-bottom:24px; opacity:0.8; font-size:0.95rem;">This cannot be undone.</p>
+        <div class="form-actions">
+            <button class="btn-primary" style="background:#ff6b6b" onclick="confirmDelete()">Delete</button>
+            <button class="btn-secondary" onclick="closeModal('deleteOverlay')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────────────
+const ADMIN_PASSWORD = "Khulja_Sim_Sim@2026";   // ← change this to your desired password
+const STORAGE_KEY    = "hibitsu_positions";
+
+// ── State ───────────────────────────────────────────────────────────────────
+let positions   = [];
+let editingId   = null;   // null = new, otherwise id of position being edited
+let deletingId  = null;
+
+// ── Seed data (shown on first load) ─────────────────────────────────────────
+const SEED = [
+    {
+        id: 1,
+        type: "phd",
+        title: "PhD Student – Transcranial Ultrasound Imaging",
+        meta: "NCBS, Bangalore | 5 Years | Funded",
+        desc: "We are seeking a highly motivated PhD student to work on developing and optimising transcranial focused-ultrasound protocols for non-invasive, high-resolution brain imaging in rodents and humans. Background in physics, biomedical engineering, or neuroscience required.",
+        link: "mailto:bhalla@ncbs.res.in",
+        linkLabel: "Apply to Dr. Bhalla"
+    },
+    {
+        id: 2,
+        type: "postdoc",
+        title: "Postdoctoral Fellow – Computational Skull-Modelling",
+        meta: "IIT Madras, Chennai | 2–3 Years | Funded",
+        desc: "Postdoc position focusing on finite-element and ray-tracing models of ultrasound propagation through heterogeneous skull bone. Expertise in COMSOL, k-Wave, or similar simulation environments is desirable.",
+        link: "mailto:arunthittai@iitm.ac.in",
+        linkLabel: "Apply to Dr. Thittai"
+    },
+    {
+        id: 3,
+        type: "ra",
+        title: "Research Associate – In-Vivo Rodent Imaging",
+        meta: "NCBS, Bangalore | 1 Year (Renewable)",
+        desc: "Support in-vivo imaging experiments in mouse models. Responsibilities include animal handling, ultrasound data acquisition, and basic data processing. MSc/MTech in Life Sciences or Biomedical Engineering preferred.",
+        link: "mailto:tapomoy@ncbs.res.in",
+        linkLabel: "Apply to Dr. Bhattacharjee"
+    }
+];
+
+// ── Bootstrap ────────────────────────────────────────────────────────────────
+(function init() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    positions = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(SEED));
+    render();
+})();
+
+function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(positions));
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+const BADGE_MAP = { phd:"PhD", postdoc:"Postdoc", ra:"Research Associate", intern:"Intern / Project Student" };
+
+function render() {
+    const list = document.getElementById("positionsList");
+    if (!positions.length) {
+        list.innerHTML = `
+            <div class="empty-state">
+                <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M9 12h6m-3-3v6M5 20h14a2 2 0 002-2V8l-5-5H5a2 2 0 00-2 2v13a2 2 0 002 2z"/>
+                </svg>
+                <p>No open positions at the moment.<br>Check back soon!</p>
+            </div>`;
+        return;
+    }
+
+    list.innerHTML = positions.map(p => `
+        <div class="position-card" id="card-${p.id}">
+            <div class="card-actions">
+                <button class="btn-edit"   onclick="openEdit(${p.id})">✎ Edit</button>
+                <button class="btn-delete" onclick="openDelete(${p.id})">✕ Delete</button>
+            </div>
+            <span class="badge badge-${p.type}">${BADGE_MAP[p.type] || p.type}</span>
+            <h3>${esc(p.title)}</h3>
+            ${p.meta ? `<div class="meta">${esc(p.meta)}</div>` : ""}
+            <p>${esc(p.desc)}</p>
+            ${p.link ? `<a href="${esc(p.link)}" target="_blank" class="apply-link">${esc(p.linkLabel || "Apply Now")}</a>` : ""}
+        </div>
+    `).join("");
+}
+
+function esc(str) {
+    return String(str)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;");
+}
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+function openAuth() {
+    if (document.body.classList.contains("admin-mode")) {
+        // Already unlocked: toggle off
+        document.body.classList.remove("admin-mode");
+        document.getElementById("adminBtn").textContent = "✎ Edit Positions";
+        return;
+    }
+    document.getElementById("pwInput").value = "";
+    document.getElementById("pwError").style.display = "none";
+    openModal("authOverlay");
+    setTimeout(() => document.getElementById("pwInput").focus(), 80);
+}
+
+function checkPassword() {
+    const val = document.getElementById("pwInput").value;
+    if (val === ADMIN_PASSWORD) {
+        closeModal("authOverlay");
+        document.body.classList.add("admin-mode");
+        document.getElementById("adminBtn").textContent = "✓ Exit Edit Mode";
+        // Show add button
+        document.getElementById("adminBtn").onclick = function() {
+            document.body.classList.remove("admin-mode");
+            this.textContent = "✎ Edit Positions";
+            this.onclick = openAuth;
+        };
+        // Append "Add Position" button
+        const bar = document.querySelector(".admin-bar");
+        if (!document.getElementById("addBtn")) {
+            const addBtn = document.createElement("button");
+            addBtn.id = "addBtn";
+            addBtn.textContent = "+ Add Position";
+            addBtn.style.marginRight = "10px";
+            addBtn.onclick = () => openEdit(null);
+            bar.insertBefore(addBtn, bar.firstChild);
+        } else {
+            document.getElementById("addBtn").style.display = "inline-block";
+        }
+    } else {
+        document.getElementById("pwError").style.display = "block";
+        document.getElementById("pwInput").value = "";
+        document.getElementById("pwInput").focus();
+    }
+}
+
+// ── Edit / Add ───────────────────────────────────────────────────────────────
+function openEdit(id) {
+    editingId = id;
+    const p = id ? positions.find(x => x.id === id) : null;
+    document.getElementById("editModalTitle").textContent = id ? "Edit Position" : "Add Position";
+    document.getElementById("fTitle").value     = p ? p.title     : "";
+    document.getElementById("fType").value      = p ? p.type      : "phd";
+    document.getElementById("fMeta").value      = p ? p.meta      : "";
+    document.getElementById("fDesc").value      = p ? p.desc      : "";
+    document.getElementById("fLink").value      = p ? p.link      : "";
+    document.getElementById("fLinkLabel").value = p ? p.linkLabel : "";
+    document.getElementById("editError").style.display = "none";
+    openModal("editOverlay");
+}
+
+function savePosition() {
+    const title = document.getElementById("fTitle").value.trim();
+    const desc  = document.getElementById("fDesc").value.trim();
+    if (!title || !desc) {
+        document.getElementById("editError").style.display = "block";
+        return;
+    }
+    const entry = {
+        id:        editingId || Date.now(),
+        type:      document.getElementById("fType").value,
+        title,
+        meta:      document.getElementById("fMeta").value.trim(),
+        desc,
+        link:      document.getElementById("fLink").value.trim(),
+        linkLabel: document.getElementById("fLinkLabel").value.trim() || "Apply Now"
+    };
+
+    if (editingId) {
+        const idx = positions.findIndex(x => x.id === editingId);
+        positions[idx] = entry;
+    } else {
+        positions.push(entry);
+    }
+
+    save();
+    render();
+    closeModal("editOverlay");
+}
+
+// ── Delete ───────────────────────────────────────────────────────────────────
+function openDelete(id) {
+    deletingId = id;
+    openModal("deleteOverlay");
+}
+
+function confirmDelete() {
+    positions = positions.filter(x => x.id !== deletingId);
+    save();
+    render();
+    closeModal("deleteOverlay");
+}
+
+// ── Modal helpers ────────────────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add("active"); }
+function closeModal(id) { document.getElementById(id).classList.remove("active"); }
+
+// Close on backdrop click
+document.querySelectorAll(".overlay").forEach(ov => {
+    ov.addEventListener("click", e => { if (e.target === ov) ov.classList.remove("active"); });
+});
+</script>
+
+</body>
+</html>
