@@ -470,9 +470,10 @@ const SEED = [
 ];
 
 // ── Bootstrap ────────────────────────────────────────────────────────────────
-positions = JSON.parse(JSON.stringify(SEED));
-render();
-
+document.addEventListener("DOMContentLoaded", function() {
+    positions = JSON.parse(JSON.stringify(SEED));
+    render();
+});
 // ── Render ───────────────────────────────────────────────────────────────────
 const BADGE_MAP = { phd:"PhD", postdoc:"Postdoc", ra:"Research Associate", intern:"Intern / Project Student" };
 
